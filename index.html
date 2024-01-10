@@ -1,0 +1,145 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ko" lang="ko">
+<head>
+<title>Cross-Browser QRCode generator for Javascript</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no" />
+<script type="text/javascript" src="jquery.min.js"></script>
+<script type="text/javascript" src="qrcode.js"></script>
+</head>
+<body>
+    <h1>停車場折抵券產生器</h1>
+    <div>
+        <a style="width:40%">1. 發票字軌號碼 (10)：</a>
+        <input id="text1" type="text" value="GG12345678" style="width:60%" />
+    </div>
+    <div>
+        <a style="width:40%">2. 發票開立日期 (7)：</a>
+        <input id="text2" type="text" value="1121219" style="width:60%" />
+    </div>
+    <div hidden>
+        <a style="width:40%">3. 隨機碼 (4)：</a>
+        <input id="text3" type="text" value="4551" style="width:60%" />
+    </div>
+    <div hidden>
+        <a style="width:40%">4. 銷售額 (8)：</a>
+        <input id="text4" type="text" value="5000" style="width:60%" />
+    </div>
+    <div>
+        <a style="width:40%">5. 總計額 (8)：</a>
+        <input id="text5" type="text" value="5000" style="width:60%" />
+    </div>
+    <div hidden>
+        <a style="width:40%">6. 買方統一編號 (8)：</a>
+        <input id="text6" type="text" value="00000000" style="width:60%" />
+    </div>
+    <div>
+        <a style="width:40%">7. 賣方統一編號 (8)：</a>
+        <input id="text7" type="text" value="12345678" style="width:60%" />
+    </div>
+    <div hidden>
+        <a style="width:40%">8. 加密驗證資訊 (24)：</a>
+        <input id="text8" type="text" value="5q+b6Iy46Iy45YGc6LuK5Yi4:" style="width:60%" />
+    </div>
+    <div hidden>
+        <a style="width:40%">9. 營業人自行使用區 (10碼)：</a>
+        <input id="text9" type="text" value="XXXXXXXXXX:" style="width:60%" />
+    </div>
+    <div hidden>
+        <a style="width:40%">10.二維條碼記載完整品目筆數：</a>
+        <input id="text10" type="text" value="1:" style="width:60%" />
+    </div>
+    <div hidden>
+        <a style="width:40%">11.該張發票交易品目總筆數：</a>
+        <input id="text11" type="text" value="1:" style="width:60%" />
+    </div>
+    <div hidden>
+        <a style="width:40%">12.中文編碼參數 (1碼)：</a>
+        <input id="text12" type="text" value="1:" style="width:60%" />
+    </div>
+    
+    <br />
+<div id="qrcode" style="width:100px; height:100px; margin:15px 15px 15px 30px;"></div>
+
+<script type="text/javascript">
+
+var qrcode = new QRCode(document.getElementById("qrcode"), {
+	width : 256,
+	height : 256,
+    colorDark : "#000000",
+    colorLight : "#ffffff",
+    correctLevel : QRCode.CorrectLevel.H
+});
+
+makeDefault();
+makeCode();
+
+//預設值
+function makeDefault()
+{
+    const today = new Date();    
+    const rocYear = today.getFullYear() - 1911;
+    const rocMonth = (today.getMonth() + 1).toString().padStart(2, '0'); // 使用padStart在月份小于10时补零
+    const rocDay = today.getDate().toString().padStart(2, '0'); // 使用padStart在日期小于10时补零
+    document.getElementById("text2").value = `${rocYear}${rocMonth}${rocDay}`;
+    document.getElementById("text3").value = (Math.floor(Math.random() * 9999) + 0).toString(10).padStart(4, '0');
+}
+
+//產生QRcode
+function makeCode () 
+{	
+    /*
+    1. 發票字軌號碼 (10)：GG12345678
+    2. 發票開立日期 (7)：1120725
+    3. 隨機碼 (4)：1234
+    4. 銷售額 (8)：00000000
+    5. 總計額 (8)：000000b8
+    6. 買方統一編號 (8)：00000000
+    7. 賣方統一編號 (8)：12345678
+    8. 加密驗證資訊 (24)：ZMf7lyy6oPDZzamumqwngA==:
+    9. 營業人自行使用區 (10碼)：XXXXXXXXXX:
+    10.二維條碼記載完整品目筆數：0:
+    11.該張發票交易品目總筆數：0:
+    12.中文編碼參數 (1碼)：1:
+    */	
+    var content='';
+    for(var A=1;A<=12;A++)
+    {
+        switch(A)
+        {
+            case 4:
+                {
+                    content+= parseInt((document.getElementById("text5").value+''), 10).toString(16).padStart(8, '0');
+                    //console.log(parseInt('50', 10).toString(16).padStart(8, '0'));                    
+                    //console.log(parseInt((document.getElementById("text5").value+''), 10).toString(16).padStart(8, '0'));                    
+                }
+                break;
+            case 5:
+                {
+                    content+= parseInt((document.getElementById("text5").value+''), 10).toString(16).padStart(8, '0');
+                }
+                break;
+            default:
+                {
+                    content+= document.getElementById("text"+A).value;
+                }
+                break;
+        }
+    }		
+	
+    console.log('content='+content);
+	qrcode.makeCode(content);
+}
+
+//觸發刷新
+$('[id^="text"]').
+	on("blur", function () {
+		makeCode();
+	}).
+	on("keydown", function (e) {
+		if (e.keyCode == 13) {
+			makeCode();
+		}
+	});
+</script>
+</body>
