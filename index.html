@@ -103,7 +103,7 @@ function makeCode ()
     12.中文編碼參數 (1碼)：1:
     */	
     var content='';
-    for(var A=1;A<=12;A++)
+    for(var A=1;A<=13;A++)
     {
         switch(A)
         {
@@ -117,6 +117,11 @@ function makeCode ()
             case 5:
                 {
                     content+= parseInt((document.getElementById("text5").value+''), 10).toString(16).padStart(8, '0');
+                }
+                break;
+            case 13:
+                {
+                    content+= `停車折抵費:1:${parseInt((document.getElementById("text5").value+''), 10)}`;
                 }
                 break;
             default:
